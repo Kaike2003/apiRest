@@ -28,6 +28,21 @@ export default class AdminRouter extends AdminController {
             , super.atualizar_palavra_passe_admin)
         this.routerAdmin.post("/login_admin", super.login_admin)
 
+        this.routerAdmin.put("/atualizar_perfil_informacoes_admin/:id_utilizador",
+            permissao_admin,
+            super.atualizar_perfil_informacoes
+        );
+
+        this.routerAdmin.put("/atualizar_perfil_telefone",
+            permissao_admin,
+            super.atualizar_perfil_telefone
+        );
+
+        this.routerAdmin.put("/atualizar_perfil_email",
+            permissao_admin,
+            super.atualizar_perfil_email
+        );
+
 
         // Funcionalidades
         this.routerAdmin.post('/criar_documento_perdido_admin/:id_utilizador',
@@ -40,7 +55,7 @@ export default class AdminRouter extends AdminController {
             carregar_foto_perdido.single("foto"),
             super.atualizar_perdi_um_documento
         )
-        
+
         this.routerAdmin.delete("/deletar_perdi_um_documento/:id_utilizador/:id_documento",
             permissao_admin,
             super.deletar_perdi_um_documento
@@ -57,7 +72,7 @@ export default class AdminRouter extends AdminController {
             carregar_foto_achado.single("foto"),
             super.atualizar_achei_um_documento
         )
-        
+
         this.routerAdmin.delete("/deletar_achado_um_documento/:id_utilizador/:id_documento",
             permissao_admin,
             super.deletar_achado_um_documento
@@ -82,6 +97,19 @@ export default class AdminRouter extends AdminController {
             permissao_admin,
             super.listar_documento_achados
         )
+
+        this.routerAdmin.put("/banirUtilizador_admin/:id_utilizador",
+            permissao_admin,
+            super.banir_utilizador
+        )
+
+        this.routerAdmin.put("/publicar_documento/:id_utilizador/:id_documento",
+            permissao_admin,
+            super.publicar_documento
+        )
+
+       
+
     }
 
 }

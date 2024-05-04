@@ -31,68 +31,87 @@ export default class EstudanteController extends FuncionalidadesController {
             data_nascimento: new Date(data_nascimento)
         }).then(async (sucesso_validacacao) => {
 
-            const result_admin_telefone = await prisma.utilizador.findUnique({
+
+            const result_estudante_email = await prisma.utilizador.findUnique({
                 where: {
-                    telefone: telefone,
+                    email: sucesso_validacacao.email
                 }
             })
 
-            if (!result_admin_telefone) {
-
-                if (sucesso_validacacao.curso === curso_sistema.BIOQUIMICA || sucesso_validacacao.curso === curso_sistema.DESENHADOR || sucesso_validacacao.curso === curso_sistema.ENERGIAS || sucesso_validacacao.curso === curso_sistema.INFORMATICA || sucesso_validacacao.curso === curso_sistema.INFORMATICA || sucesso_validacacao.curso === curso_sistema.MAQUINAS || sucesso_validacacao.curso === curso_sistema.NONA || sucesso_validacacao.curso === curso_sistema.OITAVA || sucesso_validacacao.curso === curso_sistema.SETIMA) {
-
-                    if (sucesso_validacacao.classe === classe_sistema.DECIMA || sucesso_validacacao.classe === classe_sistema.PRIMEIRA || sucesso_validacacao.classe === classe_sistema.SEGUNDA || sucesso_validacacao.classe === classe_sistema.TERCEIRA) {
-
-                        const result_admin = await prisma.utilizador.create({
-                            data: {
-                                nome: sucesso_validacacao.nome,
-                                email: sucesso_validacacao.email,
-                                palavra_passe: await new PalavraPasse().Encriptar(sucesso_validacacao.palavra_passe),
-                                telefone: sucesso_validacacao.telefone,
-                                data_nascimento: new Date(sucesso_validacacao.data_nascimento),
-                                codigo_autenticacao: String(string_aleatoria),
-                                classe: sucesso_validacacao.classe,
-                                curso: sucesso_validacacao.curso,
-                                tipo_utilizador: "ESTUDANTE"
-                            },
-                            select: {
-                                nome: true,
-                                email: true,
-                                telefone: true,
-                                codigo_autenticacao: true,
-                                classe: true,
-                                curso: true,
-                                banido: true,
-                                tipo_utilizador: true
-                            }
-                        })
-
-                        console.log(new Nodemailer().transporter(sucesso_validacacao.email, sucesso_validacacao.nome, string_aleatoria)
-                        )
-
-                        new Nodemailer().transporter(sucesso_validacacao.email, sucesso_validacacao.nome, string_aleatoria)
-
-                        res.status(201).json(result_admin)
-
-
-                    } else {
-                        res.status(400).json(`A classe ${sucesso_validacacao.classe} nao existe no Suchen`)
-                    }
-
-
-                } else {
-                    res.status(400).json(`O curso ${sucesso_validacacao.curso} nao existe no Suchen`)
+            const result_estudante_telefone = await prisma.utilizador.findUnique({
+                where: {
+                    telefone: Number(sucesso_validacacao.telefone)
                 }
+            })
 
+            if (result_estudante_telefone?.telefone === sucesso_validacacao.telefone) {
 
+                res.status(400).json(`Já existe um conta cadastrada com esse número ${result_estudante_telefone.telefone}. Usa outro número de telefone.`)
 
             } else {
 
-                if (result_admin_telefone.telefone === telefone || result_admin_telefone.email === email) {
-                    res.status(400).json("Já existe um conta cadastrada com esse número. Crie sua conta com um seu número de telefone ou já existe um conta cadastrada com esse email. Crie sua conta com um seu número de email.")
+                if (result_estudante_email?.email === sucesso_validacacao.email) {
+
+                    res.status(400).json(`Já existe um conta cadastrada com o email ${result_estudante_email.email}. Usa outro email.`)
+
+                } else {
+
+                    if (sucesso_validacacao.curso === curso_sistema.BIOQUIMICA || sucesso_validacacao.curso === curso_sistema.DESENHADOR || sucesso_validacacao.curso === curso_sistema.ENERGIAS || sucesso_validacacao.curso === curso_sistema.INFORMATICA || sucesso_validacacao.curso === curso_sistema.INFORMATICA || sucesso_validacacao.curso === curso_sistema.MAQUINAS || sucesso_validacacao.curso === curso_sistema.NONA || sucesso_validacacao.curso === curso_sistema.OITAVA || sucesso_validacacao.curso === curso_sistema.SETIMA) {
+
+                        if (sucesso_validacacao.classe === classe_sistema.DECIMA || sucesso_validacacao.classe === classe_sistema.PRIMEIRA || sucesso_validacacao.classe === classe_sistema.SEGUNDA || sucesso_validacacao.classe === classe_sistema.TERCEIRA) {
+
+                            const result_estudante = await prisma.utilizador.create({
+                                data: {
+                                    nome: sucesso_validacacao.nome,
+                                    email: sucesso_validacacao.email,
+                                    palavra_passe: await new PalavraPasse().Encriptar(sucesso_validacacao.palavra_passe),
+                                    telefone: sucesso_validacacao.telefone,
+                                    data_nascimento: new Date(sucesso_validacacao.data_nascimento),
+                                    codigo_autenticacao: String(string_aleatoria),
+                                    classe: sucesso_validacacao.classe,
+                                    curso: sucesso_validacacao.curso,
+                                    tipo_utilizador: "ESTUDANTE"
+                                },
+                                select: {
+                                    nome: true,
+                                    email: true,
+                                    telefone: true,
+                                    codigo_autenticacao: true,
+                                    classe: true,
+                                    curso: true,
+                                    banido: true,
+                                    tipo_utilizador: true
+                                }
+                            })
+
+                            console.log(new Nodemailer().transporter(sucesso_validacacao.email, sucesso_validacacao.nome, string_aleatoria)
+                            )
+
+                            new Nodemailer().transporter(sucesso_validacacao.email, sucesso_validacacao.nome, string_aleatoria)
+
+                            res.status(201).json(`Conta criada, verifique o seu email, acabamos de enviar o seu codigo de autenticação.`)
+
+
+                        } else {
+                            res.status(400).json(`A classe ${sucesso_validacacao.classe} nao existe no Suchen`)
+                        }
+
+
+                    } else {
+                        res.status(400).json(`O curso ${sucesso_validacacao.curso} nao existe no Suchen`)
+                    }
+
+
+
                 }
 
+
             }
+
+
+
+
+
 
         }).catch((err) => {
             res.status(400).json(err)
@@ -269,18 +288,51 @@ export default class EstudanteController extends FuncionalidadesController {
             })
 
             if (!result_email) {
-                res.status(400).json(`O email ${email} nao existe no suchen`)
-            } else {
-                if (result_email.email === sucesso_validacao.email && result_email.tipo_utilizador === "ESTUDANTE") {
-                    const senha_correta = await new CompararPalavraPasse().comparar_palavra_passe(sucesso_validacao.palavra_passe, result_email.palavra_passe)
 
-                    if (senha_correta === true && result_email.autenticado === "TRUE" && result_email.banido === "FALSE" && result_email.tipo_utilizador === "ESTUDANTE") {
-                        const logado = new Jwt().token_sign(result_email.id)
-                        res.status(200).json(logado)
+                res.status(400).json(`O email ${email} não existe no suchen.`)
+
+            } else {
+
+                if (result_email.email === sucesso_validacao.email) {
+
+                    if (result_email.banido === "TRUE") {
+                        res.status(400).json(`${result_email.email} sua conta está banida da suchen.`)
                     } else {
-                        res.status(400).json(`Credencias incorretas email:${sucesso_validacao.email}, palavra-passe:${sucesso_validacao.palavra_passe}`)
+
+                        if (result_email.autenticado === "FALSE") {
+                            res.status(400).json(`${result_email.email} sua conta não autenticada na suchen. Autentica a sua conta.`)
+                        } else {
+
+                            if (result_email.tipo_utilizador === "ESTUDANTE") {
+
+                                const senha_correta = await new CompararPalavraPasse().comparar_palavra_passe(sucesso_validacao.palavra_passe, result_email.palavra_passe)
+
+
+                                if (senha_correta === true) {
+                                    const logado = new Jwt().token_sign(result_email.id)
+                                    console.log(logado)
+                                    res.status(200).json(logado)
+                                } else {
+                                    res.status(400).json(`A sua palavra passe está incorreta.`)
+                                }
+
+                            } else {
+
+                                res.status(400).json(`${result_email.email} tente iniciar sessão na rota de funcionário.`)
+
+                            }
+
+
+                        }
+
+
+
+
                     }
 
+
+                } else {
+                    res.status(400).json(`${sucesso_validacao.email} esse email não esta cadastrado como administrador na shucen.`)
                 }
             }
 
@@ -292,6 +344,6 @@ export default class EstudanteController extends FuncionalidadesController {
 
     }
 
-   
+
 
 }

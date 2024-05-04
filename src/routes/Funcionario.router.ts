@@ -28,6 +28,20 @@ export default class FuncionarioRouter extends FuncinarioController {
             permissao_funcionario
             , super.atualizar_palavra_passe_funcionario)
         this.routerFuncionario.post("/login_funcionario", super.login_funcionario)
+        this.routerFuncionario.put("/atualizar_perfil_informacoes_funcionario/:id_utilizador",
+            permissao_funcionario,
+            super.atualizar_perfil_informacoes
+        );
+
+        this.routerFuncionario.put("/atualizar_perfil_telefone",
+            permissao_funcionario,
+            super.atualizar_perfil_telefone
+        );
+
+        this.routerFuncionario.put("/atualizar_perfil_email",
+            permissao_funcionario,
+            super.atualizar_perfil_email
+        );
 
 
 
@@ -42,7 +56,7 @@ export default class FuncionarioRouter extends FuncinarioController {
             carregar_foto_perdido.single("foto"),
             super.atualizar_perdi_um_documento
         )
-        
+
         this.routerFuncionario.delete("/deletar_perdi_um_documento/:id_utilizador/:id_documento",
             permissao_funcionario,
             super.deletar_perdi_um_documento
@@ -58,7 +72,7 @@ export default class FuncionarioRouter extends FuncinarioController {
             carregar_foto_achado.single("foto"),
             super.atualizar_achei_um_documento
         )
-       
+
         this.routerFuncionario.delete("/deletar_achado_um_documento/:id_utilizador/:id_documento",
             permissao_funcionario,
             super.deletar_achado_um_documento

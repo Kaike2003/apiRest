@@ -29,6 +29,22 @@ export default class EstudanteRouter extends EstudanteController {
             permissao_estudante
             , super.atualizar_palavra_passe_estudante)
 
+        this.router_Estudante.put("/atualizar_perfil_informacoes_estudante/:id_utilizador",
+            permissao_estudante,
+            super.atualizar_perfil_informacoes
+        );
+
+        this.router_Estudante.put("/atualizar_perfil_telefone",
+            permissao_estudante,
+            super.atualizar_perfil_telefone
+        );
+
+        this.router_Estudante.put("/atualizar_perfil_email",
+            permissao_estudante,
+            super.atualizar_perfil_email
+        );
+
+
 
         // Funcionalidades
         this.router_Estudante.post('/criar_documento_perdido_estudante/:id_utilizador',
@@ -41,7 +57,7 @@ export default class EstudanteRouter extends EstudanteController {
             carregar_foto_perdido.single("foto"),
             super.atualizar_perdi_um_documento
         )
-        
+
         this.router_Estudante.delete("/deletar_perdi_um_documento/:id_utilizador/:id_documento",
             permissao_estudante,
             super.deletar_perdi_um_documento
@@ -57,7 +73,7 @@ export default class EstudanteRouter extends EstudanteController {
             carregar_foto_achado.single("foto"),
             super.atualizar_achei_um_documento
         )
-       
+
         this.router_Estudante.delete("/deletar_achado_um_documento/:id_utilizador/:id_documento",
             permissao_estudante,
             super.deletar_achado_um_documento
@@ -76,6 +92,11 @@ export default class EstudanteRouter extends EstudanteController {
         this.router_Estudante.get("/listar_documento_achado_estudante/:id_utilizador",
             permissao_estudante,
             super.listar_documento_achados
+        )
+
+        this.router_Estudante.put("/publicar_documento/:id_utilizador/:id_documento",
+            permissao_estudante,
+            super.publicar_documento
         )
 
     }

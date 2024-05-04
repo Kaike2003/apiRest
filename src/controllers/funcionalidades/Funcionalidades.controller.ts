@@ -2,9 +2,10 @@ import { Schema_atualizar_documento_achei, Schema_atualizar_documento_perdido, S
 import { Request, Response } from "express";
 import { TSchema_criar_documento_perdido } from "../../validation/estudante.validation";
 import { prisma } from '../../../prisma/prisma';
-import { Tipo_Documento } from '@prisma/client';
+import { Classe, Curso, Tipo_Documento } from '@prisma/client';
 import Entregue_notificacao from '../../service/Entregue_notificacao';
 import EstaComigoNotificacao from '../../service/Esta_comigo_notificacao';
+import { Schema_atualizar_perfil_email, Schema_atualizar_perfil_informacao, Schema_atualizar_perfil_telefone, TSchema_atualizar_perfil_email, TSchema_atualizar_perfil_informacao, TSchema_atualizar_perfil_telefone } from '../../validation/admin.validation';
 
 export default class FuncionalidadesController {
 
@@ -954,5 +955,219 @@ export default class FuncionalidadesController {
         }
 
     }
+
+    protected async banir_utilizador(req: Request, res: Response) {
+
+        const { id_utilizador } = req.params
+
+
+        if (id_utilizador.length >= 20 && typeof id_utilizador === "string") {
+
+            const response = await prisma.utilizador.findUnique({
+                where: {
+                    id: id_utilizador
+                }
+            })
+
+            if (response?.id === id_utilizador) {
+
+                if (response.banido === "FALSE") {
+                    const responseBanido = await prisma.utilizador.update({
+                        where: {
+                            id: response.id
+                        },
+                        data: {
+                            banido: "TRUE"
+                        }
+                    })
+
+                    res.status(200).json(responseBanido)
+
+                } else {
+                    const responseBanido = await prisma.utilizador.update({
+                        where: {
+                            id: response.id
+                        },
+                        data: {
+                            banido: "FALSE"
+                        }
+                    })
+
+                    res.status(200).json(responseBanido)
+
+                }
+
+            } else {
+                res.status(400).json(id_utilizador)
+            }
+
+        }
+
+    }
+
+    protected async atualizar_perfil_informacoes(req: Request, res: Response) {
+
+        const { nome, email, classe, curso, data_nascimento }: TSchema_atualizar_perfil_informacao = req.body
+
+        const { id_utilizador } = req.params
+
+        const classe_sistema = Classe
+        const curso_sistema = Curso
+
+        Schema_atualizar_perfil_informacao.parseAsync({
+            nome: nome,
+            email: email,
+            classe: classe,
+            curso: curso,
+            data_nascimento: new Date(data_nascimento),
+        }).then(async (sucesso_validacacao) => {
+
+            if (typeof id_utilizador === "string") {
+
+
+                if (id_utilizador.length >= 15) {
+
+
+
+                    const result_id_utilizador = await prisma.utilizador.findUnique({
+                        where: {
+                            id: id_utilizador
+                        }
+                    })
+
+                    if (result_id_utilizador?.id === id_utilizador) {
+
+
+                        if (sucesso_validacacao.curso === curso_sistema.BIOQUIMICA || sucesso_validacacao.curso === curso_sistema.DESENHADOR || sucesso_validacacao.curso === curso_sistema.ENERGIAS || sucesso_validacacao.curso === curso_sistema.INFORMATICA || sucesso_validacacao.curso === curso_sistema.INFORMATICA || sucesso_validacacao.curso === curso_sistema.MAQUINAS || sucesso_validacacao.curso === curso_sistema.NONA || sucesso_validacacao.curso === curso_sistema.OITAVA || sucesso_validacacao.curso === curso_sistema.SETIMA || sucesso_validacacao.curso === curso_sistema.ADMIN || sucesso_validacacao.curso === curso_sistema.FUNCIONARIO) {
+
+                            if (sucesso_validacacao.classe === classe_sistema.DECIMA || sucesso_validacacao.classe === classe_sistema.PRIMEIRA || sucesso_validacacao.classe === classe_sistema.SEGUNDA || sucesso_validacacao.classe === classe_sistema.TERCEIRA || sucesso_validacacao.classe === classe_sistema.ADMIN || sucesso_validacacao.classe === classe_sistema.FUNCIONARIO) {
+
+
+                                const resutl = await prisma.utilizador.update({
+                                    where: {
+                                        id: result_id_utilizador.id
+                                    },
+                                    data: {
+                                        nome: sucesso_validacacao.nome,
+                                        email: sucesso_validacacao.email === undefined ? result_id_utilizador.email : sucesso_validacacao.email,
+                                        data_nascimento: new Date(sucesso_validacacao.data_nascimento),
+                                        classe: sucesso_validacacao.classe,
+                                        curso: sucesso_validacacao.curso,
+                                    }
+                                })
+
+                                res.status(201).json(resutl)
+
+                            }
+
+                        }
+
+
+
+                    }
+
+
+                } else {
+                    res.status(400).json(id_utilizador.length)
+                }
+
+            } else {
+                res.status(400).json(typeof id_utilizador)
+            }
+
+
+
+
+        })
+
+    }
+
+    protected async atualizar_perfil_telefone(req: Request, res: Response) {
+
+        const { telefone }: TSchema_atualizar_perfil_telefone = req.body
+
+
+        Schema_atualizar_perfil_telefone.parseAsync({
+            telefone: Number(telefone)
+        }).then(async (sucesso_validacao) => {
+
+            const responseTelefone = await prisma.utilizador.findUnique({
+                where: {
+                    telefone: sucesso_validacao.telefone
+                }
+            })
+
+            if (responseTelefone?.telefone === sucesso_validacao.telefone) {
+
+
+                res.status(400).json(`O numero ${sucesso_validacao.telefone} ja esta sendo utilizado na shucen.`)
+
+            } else {
+
+
+                const response = await prisma.utilizador.update({
+                    where: {
+                        id: responseTelefone?.id
+                    },
+                    data: {
+                        telefone: responseTelefone?.telefone
+                    }
+                })
+
+                res.status(200).json(response)
+
+
+            }
+
+        }).catch((error) => {
+            res.status(400).json(error)
+        })
+
+    }
+
+    protected async atualizar_perfil_email(req: Request, res: Response) {
+
+        const { email }: TSchema_atualizar_perfil_email = req.body
+
+
+        Schema_atualizar_perfil_email.parseAsync({
+            email: email
+        }).then(async (sucesso_validacao) => {
+
+            const responseEmail = await prisma.utilizador.findUnique({
+                where: {
+                    email: sucesso_validacao.email
+                }
+            })
+
+            if (responseEmail?.email === sucesso_validacao.email) {
+
+
+                res.status(400).json(`O numero ${sucesso_validacao.email} ja esta sendo utilizado na shucen.`)
+
+            } else {
+
+
+                const response = await prisma.utilizador.update({
+                    where: {
+                        id: responseEmail?.id
+                    },
+                    data: {
+                        email: responseEmail?.email
+                    }
+                })
+
+                res.status(200).json(`O seu email ${responseEmail?.email} foi alterado com sucesso.`)
+
+
+            }
+
+        }).catch((error) => {
+            res.status(400).json(error)
+        })
+
+    }
+
+   
 
 }

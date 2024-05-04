@@ -6,7 +6,7 @@ import { SchemaPesquisar, TSchemaPesquisar } from "../../validation/estudante.va
 
 
 const job = new CronJob(
-    '* * * * * *', async () => {
+    '*/5 * * * *', async () => {
 
 
         const response = await prisma.documento.findMany({
@@ -16,6 +16,8 @@ const job = new CronJob(
                 publicado: true,
             }
         })
+
+        console.log("executando...")
 
         response.map(async (data) => {
 
