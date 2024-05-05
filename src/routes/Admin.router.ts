@@ -33,12 +33,12 @@ export default class AdminRouter extends AdminController {
             super.atualizar_perfil_informacoes
         );
 
-        this.routerAdmin.put("/atualizar_perfil_telefone",
+        this.routerAdmin.put("/atualizar_perfil_telefone/:id_utilizador",
             permissao_admin,
             super.atualizar_perfil_telefone
         );
 
-        this.routerAdmin.put("/atualizar_perfil_email",
+        this.routerAdmin.put("/atualizar_perfil_email/:id_utilizador",
             permissao_admin,
             super.atualizar_perfil_email
         );

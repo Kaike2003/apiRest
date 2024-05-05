@@ -36,11 +36,13 @@ export const Schema_atualizar_perfil_informacao = z.object({
 })
 
 export const Schema_atualizar_perfil_telefone = z.object({
+    id_utilizador: z.string().min(8).max(50),
     telefone: z.number().min(111111111).max(999999999),
 })
 
 
 export const Schema_atualizar_perfil_email = z.object({
+    id_utilizador: z.string().min(8).max(50),
     email: z.string().email(),
 })
 

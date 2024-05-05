@@ -1084,10 +1084,13 @@ export default class FuncionalidadesController {
 
     protected async atualizar_perfil_telefone(req: Request, res: Response) {
 
+
+        const { id_utilizador } = req.params
         const { telefone }: TSchema_atualizar_perfil_telefone = req.body
 
 
         Schema_atualizar_perfil_telefone.parseAsync({
+            id_utilizador: id_utilizador,
             telefone: Number(telefone)
         }).then(async (sucesso_validacao) => {
 
@@ -1107,14 +1110,15 @@ export default class FuncionalidadesController {
 
                 const response = await prisma.utilizador.update({
                     where: {
-                        id: responseTelefone?.id
+                        id: sucesso_validacao?.id_utilizador
                     },
                     data: {
-                        telefone: responseTelefone?.telefone
+                        telefone: sucesso_validacao?.telefone
                     }
                 })
 
-                res.status(200).json(response)
+                res.status(200).json(`O seu numero ${sucesso_validacao.telefone} foi alterado com sucesso.`)
+
 
 
             }
@@ -1127,10 +1131,12 @@ export default class FuncionalidadesController {
 
     protected async atualizar_perfil_email(req: Request, res: Response) {
 
+        const { id_utilizador } = req.params
         const { email }: TSchema_atualizar_perfil_email = req.body
 
 
         Schema_atualizar_perfil_email.parseAsync({
+            id_utilizador: id_utilizador,
             email: email
         }).then(async (sucesso_validacao) => {
 
@@ -1150,14 +1156,14 @@ export default class FuncionalidadesController {
 
                 const response = await prisma.utilizador.update({
                     where: {
-                        id: responseEmail?.id
+                        id: sucesso_validacao.id_utilizador
                     },
                     data: {
-                        email: responseEmail?.email
+                        email: sucesso_validacao.email
                     }
                 })
 
-                res.status(200).json(`O seu email ${responseEmail?.email} foi alterado com sucesso.`)
+                res.status(200).json(`O seu email ${sucesso_validacao.email} foi alterado com sucesso.`)
 
 
             }
@@ -1168,6 +1174,6 @@ export default class FuncionalidadesController {
 
     }
 
-   
+
 
 }
